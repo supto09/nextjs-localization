@@ -104,6 +104,15 @@
   transform: translateZ(0);
 }
 
+.linkContainer{
+  display: flex;
+  flex-direction: row;
+}
+.linkContainer p {
+  margin-right: 10px;
+  border: 0
+}
+
 .logo {
   position: relative;
 }
