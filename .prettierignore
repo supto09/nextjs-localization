@@ -1,0 +1,6 @@
+# files here will be ignored by prettier
+
+node_modules
+yarn.lock
+.next
+
