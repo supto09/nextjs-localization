@@ -1,16 +1,23 @@
 import React from 'react';
+import { Metadata } from 'next';
+
 import './globals.css';
 import { Inter } from 'next/font/google';
 import styles from '@/app/[lang]/page.module.css';
+import { i18n, Locale } from '@/lib/i18n/i18n-config';
+
 import LocaleSwitcher from '@/lib/components/LocalSwitcher';
-import { Metadata } from 'next';
 
 const inter = Inter({ subsets: ['latin'] });
+
+export async function generateStaticParams() {
+  return i18n.locales.map((locale) => ({ lang: locale }));
+}
 
 export async function generateMetadata({
   params
 }: {
-  params: { lang: string };
+  params: { lang: Locale };
 }): Promise<Metadata> {
   const title = `Localization - ${params.lang}`;
   const description = `Language Details ${params.lang}`;
@@ -36,7 +43,7 @@ export default function RootLayout({
   params
 }: {
   children: React.ReactNode;
-  params: { lang: string };
+  params: { lang: Locale };
 }) {
   return (
     <html lang={params.lang}>
@@ -44,7 +51,7 @@ export default function RootLayout({
         <main className={styles.main}>
           <div className={styles.description}>
             <p>Select The language to change the locale</p>
-            <LocaleSwitcher />
+            <LocaleSwitcher selectedLocale={params.lang} />
           </div>
 
           {children}
