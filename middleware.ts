@@ -3,9 +3,22 @@ import type { NextRequest } from 'next/server';
 
 import { match as matchLocale } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
-import { i18n } from '@/lib/i18n/i18n-config';
+import { i18n, LOCALE_COOKIE_NAME } from '@/lib/i18n/i18n-config';
 
+/**
+ * this method select the locale to be used. it looks in browser cookies if any locale is selected.
+ *    priority of locale selection:
+ *    1. locale saved in cookies (user selected)
+ *    2. default locale from browser
+ *    3. en
+ */
 function getLocale(request: NextRequest): string | undefined {
+  // select locale information saved in browser cookie
+  const localeFromCookie = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
+  if (localeFromCookie) {
+    return localeFromCookie;
+  }
+
   // Negotiator expects plain object so we need to transform headers
   const negotiatorHeaders: Record<string, string> = {};
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
@@ -39,6 +52,14 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Matcher ignoring `/_next/` and `/api/`
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)'
+  ]
 };

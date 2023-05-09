@@ -19,7 +19,7 @@ export default async function Home({ params }: PageParams) {
       </div>
 
       <div className={styles.grid}>
-        <Link href={`${params.lang}/details`} className={styles.card}>
+        <Link href={'details'} className={styles.card}>
           <h2>
             {dictionary['home-page']['details-title']} <span>-&gt;</span>
           </h2>

@@ -1,7 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from '@/app/[lang]/page.module.css';
 import { i18n, Locale } from '@/lib/i18n/i18n-config';
 
@@ -11,11 +10,28 @@ type Props = {
 
 export default function LocaleSwitcher({ selectedLocale }: Props) {
   const pathName = usePathname();
-  const redirectedPathName = (locale: string) => {
-    if (!pathName) return '/';
-    const segments = pathName.split('/');
-    segments[1] = locale;
-    return segments.join('/');
+  const router = useRouter();
+
+  /**
+   * saves the local information in cookies and goes to that url after router refresh
+   * @param locale
+   */
+  const handleLocaleClick = (locale: string) => {
+    fetch('/api/save-locale', {
+      method: 'POST',
+      body: JSON.stringify({
+        locale: locale
+      })
+    }).finally(() => {
+      router.refresh();
+
+      if (!pathName) return '/';
+      const segments = pathName.split('/');
+      segments[1] = locale;
+      const url = segments.join('/');
+
+      router.push(url);
+    });
   };
 
   return (
@@ -23,8 +39,9 @@ export default function LocaleSwitcher({ selectedLocale }: Props) {
       {i18n.locales.map((locale) => (
         <p
           key={locale}
-          className={selectedLocale === locale ? styles.highLight : undefined}>
-          <Link href={redirectedPathName(locale)}>{locale}</Link>
+          className={selectedLocale === locale ? styles.highLight : undefined}
+          onClick={() => handleLocaleClick(locale)}>
+          {locale}
         </p>
       ))}
     </div>
